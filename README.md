@@ -7,3 +7,6 @@ my way up to a symplectic solver. We shall see how it goes.
 
 Project 1:
 1D Simple Harmonic Oscillator
+
+Project 2:
+Kepler Orbit 
