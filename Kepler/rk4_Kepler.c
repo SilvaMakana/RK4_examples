@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 /* Making a RK4 routine for solving a second order ODE that can be cast into two first order ODE */
 /* Vector equation, so should have 2n - first order ODEs (n = 2 for motion in the plane) */
 /* y'' = -G M / y^2*/
@@ -165,18 +166,74 @@ void rk4(double dt, double t0, double r0, double phi0, int n, double vr0, double
 /* Here we execute it */
 int main()
 {
-	double h=0.01, t, t0, t1, r0, phi0, vr0, vphi0, *r, *phi, *vr, *vphi;
+	double h=0.01, t, t0, t1, r0, phi0, vr0, vr02, vphi0, *r, *phi, *vr, *vphi;
     double x, y;
     double L_ini, L_t, Delta_L;
     double E_ini, E_t, Delta_E;
-	int i, n;
+	double eccen_ini, eccen_ini2, eccen_t, eccen_t2, L_ini2, Delta_eccen, eccen_tol = 1.0e-10;
+	int i, n, sign_vr;
+	char FLAG_INI[10];
 
-	printf("Starting time t0, initial position (r0, phi0), initial derivative (vr0, vphi0), and final t point t1: \n");
-	scanf("%lf %lf %lf %lf %lf %lf", &t0, &r0, &phi0, &vr0, &vphi0, &t1);
-    printf("Read: t0=%g r0=%g phi0=%g vr0=%g vphi0=%g t1=%g\n", t0, r0, phi0, vr0, vphi0, t1);
+	printf("Input velocities or energy: \n");
+	scanf("%9s", FLAG_INI); // The acceptable flags are VEL (for specifying velocities or ENERGY (for specifying specific energy and angular momentum))
+
+	if (strcmp(FLAG_INI, "VEL") == 0)
+	{
+		printf("Starting time t0, initial position (r0, phi0), initial derivative (vr0, vphi0), and final t point t1: \n");
+		scanf("%lf %lf %lf %lf %lf %lf", &t0, &r0, &phi0, &vr0, &vphi0, &t1);
+    	printf("Read: t0=%g r0=%g phi0=%g vr0=%g vphi0=%g t1=%g\n", t0, r0, phi0, vr0, vphi0, t1);
+	}
+	
+	else if (strcmp(FLAG_INI, "ENERGY") == 0)
+	{
+		printf("Starting time t0, initial position (r0, phi0), initial specific energy and eccentricity (E, e), and final t point t1: \n");
+		scanf("%lf %lf %lf %lf %lf %d %lf", &t0, &r0, &phi0, &E_ini, &eccen_ini, &sign_vr, &t1);
+    	printf("Read: t0 = %g r0 = %g phi0 = %g E_ini = %g eccen_ini = %g sign of radial velocity = %d t1 = %g\n", t0, r0, phi0, E_ini, eccen_ini, sign_vr, t1);
+
+		L_ini2 = (eccen_ini * eccen_ini - 1) / (2 * E_ini);
+
+		if (L_ini2 < 0) // Check if the square of ang. momentum is positive
+		{
+			printf("L_ini^2 = %g \n", L_ini2);
+			printf("Negative L_ini^2... BAD combination of E and eccen... try again \n");
+			return(1);
+		}
+		
+		else
+		{
+			L_ini = sqrt(L_ini2);
+		}
+
+		vphi0 =  L_ini / (r0 * r0);
+		vr02 = 2 * (E_ini + 1 / r0) - vphi0 * r0 * vphi0 * r0;
+
+		if (vr02 < 0) // Check if the square of vr0 is positive
+		{
+			printf("vr0^2 = %g \n", vr02);
+			printf("Negative vr0^2... BAD combination of E and eccen... try again \n");
+			return(1);
+		}
+		
+		else
+		{
+			if (sign_vr != 1 && sign_vr != -1)
+				{
+    				printf("sign_vr must be either +1 or -1 \n");
+    				return(1);
+				}
+			vr0 = sign_vr * sqrt(vr02);
+		}
+		printf("Calculated vr0 and vphi0: t0=%g r0=%g phi0=%g vr0=%g vphi0=%g t1=%g\n", t0, r0, phi0, vr0, vphi0, t1);
+	}
+
+	else
+	{
+		printf("INVALID FLAG! Choose either VEL or ENERGY \n");
+		return(2);
+	}
 
 	n = 1 + (t1 - t0)/h;
-	printf("n=%d\n",n);
+	printf("Number of time steps n = %d\n",n);
 
 	r = (double *)malloc(sizeof(double) * n);
     phi = (double *)malloc(sizeof(double) * n);
@@ -189,23 +246,58 @@ int main()
 
    L_ini = vphi0 * r0 * r0;
    E_ini = 0.5 * (vr0 * vr0 + vphi0 * r0 * vphi0 * r0) - 1. / r0;
-   printf("Initial energy angular momentum is %lg and %lg \n", E_ini, L_ini);
+   eccen_ini2 = 1 + 2 * E_ini * L_ini * L_ini;
+
+   if (fabs(eccen_ini2) < eccen_tol) // For numerical purposes, check if the square of the eccentricity is close to 0
+   {
+	printf("eccentricity^2 = %g \n", eccen_ini2);
+	printf("Enforcing e = 0 \n");
+	eccen_ini2 = 0.0;
+   }
+
+   eccen_ini = sqrt(eccen_ini2);
+   printf("Initial energy, angular momentum, and eccentricity are E_ini = %lg, L_ini = %lg, and eccen_ini = %lg \n", E_ini, L_ini, eccen_ini);
 		
  
-	printf("t \t r \t phi \t vr \t vphi \t x(t) \t y(t) \t E(t) \t L(t) \t (E_ini - E(t)) / E_ini \t (L_ini - L(t)) / L_ini \n------------\n");
+	printf("t \t r \t phi \t vr \t vphi \t x(t) \t y(t) \t E(t) \t L(t) \t (E_ini - E(t)) / E_ini \t (L_ini - L(t)) / L_ini \t (eccen_ini - eccen_t) / eccen_ini \n------------\n");
 	for (i = 0; i < n; i++) {
 		t = t0 + h * i;
-		/*y2 = pow(x * x / 4 + 1, 2);*/
-		// y2 = exp(-3*x) + 2*exp(2*x);
-        // y2 = cos(k * x);
         L_t = vphi[i] * r[i] * r[i];
         E_t = 0.5 * (vr[i] * vr[i] + vphi[i] * r[i] * vphi[i] * r[i]) - 1. / r[i];
-        Delta_E = (E_ini - E_t) / E_ini;
-        Delta_L = (L_ini - L_t) / L_ini;
+		// eccen_t = sqrt(1 + 2 * E_t * L_t * L_t);
+		// Delta_E = (E_ini - E_t) / E_ini;
+        // Delta_L = (L_ini - L_t) / L_ini;
+
+		if (fabs(E_ini) < 1e-14) Delta_E = 0.0;
+		else Delta_E = (E_ini - E_t) / E_ini;
+
+		if (fabs(L_ini) < 1e-14) Delta_L = 0.0;
+		else Delta_L = (L_ini - L_t) / L_ini;
+        
+
+		eccen_t2 = 1 + 2 * E_t * L_t * L_t;
+		if (fabs(eccen_t2) < eccen_tol) // For numerical purposes, check if the square of the eccentricity is close to 0
+   			{
+				// printf("eccentricity^2 = %g \n", eccen_ini2);
+				// printf("Enforcing e = 0 \n");
+				eccen_t2 = 0.0;
+   			}
+		else if (eccen_t2 < 0.0) // For numerical purposes, check if the square of the eccentricity is negative
+			{
+    			printf("ERROR: eccen_t^2 became negative at i=%d, t=%g, eccen_t2=%g\n", i, t, eccen_t2);
+    			return(3);
+			}
+   		eccen_t = sqrt(eccen_t2);
+		
+		if (fabs(eccen_ini) < eccen_tol)
+    		Delta_eccen = 0.0;
+		else
+    		Delta_eccen = (eccen_ini - eccen_t) / eccen_ini;
+
         x = r[i] * cos(phi[i]);
         y = r[i] * sin(phi[i]);
 		// printf("%lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \n", t, r[i], phi[i], vr[i], vphi[i], E_t, L_t, Delta_E, Delta_L);
-        printf("%.1f \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \n", t, r[i], phi[i], vr[i], vphi[i], x, y, E_t, L_t, Delta_E, Delta_L);
+        printf("%.1f \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \n", t, r[i], phi[i], vr[i], vphi[i], x, y, E_t, L_t, Delta_E, Delta_L, Delta_eccen);
     }
  
  	free((char*)r);
