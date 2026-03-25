@@ -1,2 +1,2 @@
 ENERGY
-0. 10. 0. 0.01 1.05 -1 50. # t0 r0 phi0 E eccen sign_vr t1
+0. 10.0 -0.75 0.0 1.0 -1 100. # t0 r0 phi0 E L sign_vr t1

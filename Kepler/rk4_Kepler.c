@@ -170,7 +170,7 @@ int main()
     double x, y;
     double L_ini, L_t, Delta_L;
     double E_ini, E_t, Delta_E;
-	double eccen_ini, eccen_ini2, eccen_t, eccen_t2, L_ini2, Delta_eccen, eccen_tol = 1.0e-10;
+	double eccen_ini, eccen_ini2, eccen_t, eccen_t2, L_ini2, Delta_eccen, eccen_tol = 1.0e-12;
 	int i, n, sign_vr;
 	char FLAG_INI[10];
 
@@ -186,23 +186,31 @@ int main()
 	
 	else if (strcmp(FLAG_INI, "ENERGY") == 0)
 	{
-		printf("Starting time t0, initial position (r0, phi0), initial specific energy and eccentricity (E, e), and final t point t1: \n");
-		scanf("%lf %lf %lf %lf %lf %d %lf", &t0, &r0, &phi0, &E_ini, &eccen_ini, &sign_vr, &t1);
-    	printf("Read: t0 = %g r0 = %g phi0 = %g E_ini = %g eccen_ini = %g sign of radial velocity = %d t1 = %g\n", t0, r0, phi0, E_ini, eccen_ini, sign_vr, t1);
+		/* ---TODO: This block uses specific energy and eccentricity as inputs, but it is not useful for describing parabolic orbits--- */
 
-		L_ini2 = (eccen_ini * eccen_ini - 1) / (2 * E_ini);
+		// printf("Starting time t0, initial position (r0, phi0), initial specific energy and eccentricity (E, e), and final t point t1: \n");
+		// scanf("%lf %lf %lf %lf %lf %d %lf", &t0, &r0, &phi0, &E_ini, &eccen_ini, &sign_vr, &t1);
+    	// printf("Read: t0 = %g r0 = %g phi0 = %g E_ini = %g eccen_ini = %g sign of radial velocity = %d t1 = %g\n", t0, r0, phi0, E_ini, eccen_ini, sign_vr, t1);
 
-		if (L_ini2 < 0) // Check if the square of ang. momentum is positive
-		{
-			printf("L_ini^2 = %g \n", L_ini2);
-			printf("Negative L_ini^2... BAD combination of E and eccen... try again \n");
-			return(1);
-		}
+		// L_ini2 = (eccen_ini * eccen_ini - 1) / (2 * E_ini);
+
+		// if (L_ini2 < 0) // Check if the square of ang. momentum is positive
+		// {
+		// 	printf("L_ini^2 = %g \n", L_ini2);
+		// 	printf("Negative L_ini^2... BAD combination of E and eccen... try again \n");
+		// 	return(1);
+		// }
 		
-		else
-		{
-			L_ini = sqrt(L_ini2);
-		}
+		// else
+		// {
+		// 	L_ini = sqrt(L_ini2);
+		// }
+
+		/* --- */
+
+		printf("Starting time t0, initial position (r0, phi0), initial specific energy and ang. momentum (E, L), and final t point t1: \n");
+		scanf("%lf %lf %lf %lf %lf %d %lf", &t0, &r0, &phi0, &E_ini, &L_ini, &sign_vr, &t1);
+    	printf("Read: t0 = %g r0 = %g phi0 = %g E_ini = %g L_ini = %g sign of radial velocity = %d t1 = %g\n", t0, r0, phi0, E_ini, L_ini, sign_vr, t1);
 
 		vphi0 =  L_ini / (r0 * r0);
 		vr02 = 2 * (E_ini + 1 / r0) - vphi0 * r0 * vphi0 * r0;
@@ -210,7 +218,7 @@ int main()
 		if (vr02 < 0) // Check if the square of vr0 is positive
 		{
 			printf("vr0^2 = %g \n", vr02);
-			printf("Negative vr0^2... BAD combination of E and eccen... try again \n");
+			printf("Negative vr0^2... BAD combination of E and L... try again \n");
 			return(1);
 		}
 		
@@ -297,7 +305,7 @@ int main()
         x = r[i] * cos(phi[i]);
         y = r[i] * sin(phi[i]);
 		// printf("%lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \t %lg \n", t, r[i], phi[i], vr[i], vphi[i], E_t, L_t, Delta_E, Delta_L);
-        printf("%.1f \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \n", t, r[i], phi[i], vr[i], vphi[i], x, y, E_t, L_t, Delta_E, Delta_L, Delta_eccen);
+        printf("%.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \t %.15e \n", t, r[i], phi[i], vr[i], vphi[i], x, y, E_t, L_t, Delta_E, Delta_L, Delta_eccen);
     }
  
  	free((char*)r);
