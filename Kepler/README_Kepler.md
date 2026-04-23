@@ -3,7 +3,7 @@
 1) Pick which initial conditions you want (either `Kepler_VEL.input` or `Kepler_ENERGY.input`):
     - VEL: Uses initial time, position (radius and angle w.r.t x-axis), velocity (radial and angular), and a final time
     - ENERGY: Uses initial time, position (radius and angle w.r.t x-axis), energy and angular momentum (per unit mass), and a final time
-        - NOTE: Some combinations of initial position and E and L will cause the integrator to exit due to unphysical orbital conditions (e.g., negative $v_r^2$)...
+        - NOTE: Some combinations of initial position and E and L will cause the integrator to exit due to unphysical orbital conditions (e.g., $v_r^2 < 0$)...
 
 2) Build executable: 
     `gcc rk4_Kepler.c -o rk4_Kepler.exe -lm`
