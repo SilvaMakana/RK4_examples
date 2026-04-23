@@ -6,8 +6,9 @@
         - NOTE: Some combinations of initial position and E and L will cause the integrator to exit due to unphysical orbital conditions (e.g., negative $v_r^2$)...
 
 2) Run the command: 
-    ```bash
-        gcc rk4_Kepler.c -o rk4_Kepler.exe -lm
+    ```bash 
+    gcc rk4_Kepler.c -o rk4_Kepler.exe -lm```
+    
     - This creates the executable rk4_Kepler.exe
 
 3) To run the executable for either .input file, run either the command: 
