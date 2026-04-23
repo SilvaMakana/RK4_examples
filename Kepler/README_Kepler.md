@@ -7,15 +7,20 @@
 
 2) Run the command: 
     ```bash 
-    gcc rk4_Kepler.c -o rk4_Kepler.exe -lm```
-    
+    gcc rk4_Kepler.c -o rk4_Kepler.exe -lm
     - This creates the executable rk4_Kepler.exe
 
 3) To run the executable for either .input file, run either the command: 
-    - ./rk4_Kepler.exe < Kepler_ENERGY.input > Kepler_ENERGY_output.txt 
-    - ./rk4_Kepler.exe < Kepler_VEL.input > Kepler_VEL_output.txt 
+     ```bash
+    ./rk4_Kepler.exe < Kepler_ENERGY.input > Kepler_ENERGY_output.txt 
+    - or
+    ```bash
+    ./rk4_Kepler.exe < Kepler_VEL.input > Kepler_VEL_output.txt 
 
-4) Run the command: gnuplot Kepler_plottingv2.gnu
+4) Run the command: 
+    ```bash 
+    gnuplot Kepler_plottingv2.gnu
+    
     - In the set output, adjust the name of the file to match what you want plotted
     - In the plot command, adjust the name of the file to match what you want plotted
 
