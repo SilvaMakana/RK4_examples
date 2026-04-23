@@ -3,13 +3,12 @@
 1) Pick which initial conditions you want
     - VEL: Uses initial time, position (radius and angle w.r.t x-axis), velocity (radial and angular), and a final time
     - ENERGY: Uses initial time, position (radius and angle w.r.t x-axis), energy and angular momentum (per unit mass), and a final time
-        - NOTE: Some combinations of initial position and E and L will cause the integrator to exit due to unphysical orbital conditions...
+        - NOTE: Some combinations of initial position and E and L will cause the integrator to exit due to unphysical orbital conditions (e.g., negative $v_r^2$)...
 
 2) Run the command: 
     ```bash
         gcc rk4_Kepler.c -o rk4_Kepler.exe -lm
-<!-- gcc rk4_Kepler.c -o rk4_Kepler.exe -lm
-    - This creates the executable rk4_Kepler.exe -->
+    - This creates the executable rk4_Kepler.exe
 
 3) To run the executable for either .input file, run either the command: 
     - ./rk4_Kepler.exe < Kepler_ENERGY.input > Kepler_ENERGY_output.txt 
