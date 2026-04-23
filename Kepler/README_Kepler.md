@@ -22,7 +22,7 @@
 
     `gnuplot Kepler_plottingv2.gnu`
 
-    - In the set output, adjust the name of the file to match what you want plotted
-    - In the plot command, adjust the name of the file to match what you want plotted
+    - In the `set output ...`, adjust the name of the file to match what you want plotted
+    - In the `plot "Kepler_..._output.txt"`, adjust the name of the file to match what you want plotted (`VEL` or `ENERGY`)
 
     
