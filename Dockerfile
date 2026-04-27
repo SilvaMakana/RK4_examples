@@ -7,8 +7,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
-WORKDIR /workspace/RK4_Kepler
+WORKDIR /workspace/RK4_examples
 
-# Copy the local C source code to the container
+# Copy the local repo to the container
 COPY . .
 
