@@ -1,4 +1,4 @@
-RK4 Solver
+# Numerical Simulations
 
 Description:
 
